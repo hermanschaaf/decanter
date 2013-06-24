@@ -1,6 +1,7 @@
 from distutils.core import Command
 import os
 import sys
+import fnmatch
 from setuptools import setup, find_packages
 from subprocess import call
 
@@ -48,6 +49,15 @@ class TestCommand(Command):
         errno = subprocess.call(['nosetests', '--debug=DEBUG', '-s'])
         raise SystemExit(errno)
 
+def list_dir(name):
+    matches = []
+    exts = ['py', 'html', 'css', 'js']
+    for root, dirnames, filenames in os.walk(name):
+        for ext in exts:
+            for filename in fnmatch.filter(filenames, '*.%s' % ext):
+                matches.append(os.path.join(root, filename))
+    return matches
+
 # Required repositories
 with open(os.path.join(os.path.dirname(__file__), 'requirements.txt')) as f:
     install_requires = f.read().splitlines()
@@ -60,9 +70,11 @@ setup(
     install_requires=install_requires,
 
     package_data={
-        # If any package contains *.txt, *.rst or *.md files, include them:
-        '': ['*.txt', '*.rst', '*.md'],
+        # If any package contains *.txt, *.rst or *.md files, include them,
+        # and also anything in startproject
+        '': ['*.txt', '*.rst', '*.md'] + list_dir('decanter/startproject'),
     },
+
 
     # metadata for upload to PyPI
     author="Gengo",

@@ -11,28 +11,19 @@ which creates a base project called `myproject` to start working in.
 """
 
 import os
+import errno
 import argparse
-
+import shutil
+try:
+    import decanter.startproject as app
+except ImportError:
+    # probably running from within decanter:
+    import startproject as app
 
 def create_project(args):
     print "Creating your project..."
     project_name = args.name
-    create_dirs = [
-        project_name,
-        os.path.join(project_name, 'app/bundles'),
-        os.path.join(project_name, 'app/config')
-    ]
-    for d in create_dirs:
-        try:
-            os.makedirs(d)
-        except OSError as exception:
-            if exception.errno != errno.EEXIST:
-                raise
-
-    # creating files is :TODO:
-    create_files = [
-    ]
-
+    shutil.copytree(src=os.path.dirname(app.__file__), dst=project_name)
     print "Directory structure created!"
 
 
